@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class EnemyBehaviour : MonoBehaviour
 {
@@ -11,8 +13,10 @@ public class EnemyBehaviour : MonoBehaviour
     private static readonly int Hash_ActionId = Animator.StringToHash("ActionId");
 
     #region Inspector
-
-    [SerializeField] int enemyHealth;
+    [Header("Health")]
+    [SerializeField] private Image healthbar;
+    [SerializeField] int maxEnemyHealth;
+    [SerializeField] int currentEnemyHealth;
     
     [Header("Animation")]
     [SerializeField] Animator animator;
@@ -30,6 +34,12 @@ public class EnemyBehaviour : MonoBehaviour
     private bool canAttack;
     
     #endregion
+
+    private void Awake()
+    {
+        currentEnemyHealth = maxEnemyHealth;
+        RefreshHealthBar();
+    }
 
     private void Update()
     {
@@ -59,12 +69,12 @@ public class EnemyBehaviour : MonoBehaviour
 
     public void GetDamage(int damage)
     {
-        if (enemyHealth < 1) return;
+        if (currentEnemyHealth < 1) return;
         
-        enemyHealth -= damage;
+        currentEnemyHealth -= damage;
 
         animator.SetTrigger(Hash_ActionTrigger);
-        if (enemyHealth < 1)
+        if (currentEnemyHealth < 1)
         {
             OnDeath();
         }
@@ -72,6 +82,15 @@ public class EnemyBehaviour : MonoBehaviour
         {
             OnHit();
         }
+        
+        RefreshHealthBar();
+    }
+
+    void RefreshHealthBar()
+    {
+        //maxEnemyHealth
+        //currentEnemyHealth
+        healthbar.fillAmount = (float)currentEnemyHealth / (float)maxEnemyHealth;
     }
     
     public void OnDeath()
